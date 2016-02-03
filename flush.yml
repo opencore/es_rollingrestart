@@ -1,0 +1,6 @@
+- name: Perform synced flush  
+  uri: url=http://localhost:9200/_flush/synced return_content=yes method=POST status_code=200,409 
+  register: flush_response
+
+- fail: msg="There were {{ flush_response.json._shards.failed }} failed shards when performing the synced flush. Rerun with -e "ignore_failed_flush=true" to ignore the result of the flush."
+  when: "'{{flush_response.json._shards.failed}}' != '0' and not {{ ignore_failed_flush | bool}}"
